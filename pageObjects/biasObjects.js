@@ -1,3 +1,4 @@
+let bias = {}
 var biasCommands = {
     startTest: function () {
         this
@@ -68,18 +69,18 @@ var biasCommands = {
             .click('@decline') //13
         return this
     },
-    pressE: function() {
+    pressE: function (browser) {
         this
         browser.keys("e")
         return this
     },
-    pressI: function() {
+    pressI: function (browser) {
         this
         browser.keys("i")
         return this
     }
-    
 }
+
 
 module.exports = {
     url: 'https://implicit.harvard.edu/implicit/',
@@ -117,15 +118,29 @@ module.exports = {
             selector: '//*[@id="canvas"]/div[3]',
             locateStrategy: 'xpath'
         },
-        resultBox: {
-            selector: '//*[@id="pi-app"]/div[2]/div/div[2]/div/div/ol/li[1]/div/div[1]/div/h2',
+        biasResult: {
+            selector: '//*[@id="pi-app"]/div/div/div[2]/div/div/ol/li[1]/div/div[1]/div/p',
             locateStrategy: 'xpath'
-        },
-        biasResult:{
-            selector: '//*[@id="pi-app"]/div[2]/div/div[2]/div/div/ol/li[1]/div/div[1]/div/p/text()',
-            locateStrategy: 'xpath'
+            
         }
 
 
     }
+}
+async function runKeyPress(browser) {
+    let status = {
+        run: false,
+        method: ''
+    }
+    let hasError = await bias.api.element('xpath', '//*[@id="canvas"]/div[3]')
+    console.log(hasError)
+    if (!hasError.value.error) status = {
+        run: true,
+        method: 'pressI'
+    }
+    console.log(status)
+    if (status.run) {
+        bias[status.method](browser)
+    }
+    return status
 }

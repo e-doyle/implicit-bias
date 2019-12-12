@@ -3,20 +3,16 @@ var biasCommands = require('../pageObjects/biasObjects')
 module.exports = {
     beforeEach: browser => {
         bias = browser.page.biasObjects()
-        bias
-            .navigate()
+        bias.navigate()
     },
     after: browser => {
         browser.end()
     },
     'Taking the test': async browser => {
-        bias
-            .startTest()
-        //first demographic section (11 or 13 questions)
+        bias.startTest()
         bias.api.pause(1000)
         let res1 = await runDemoTests()
-        // If this runs, there was a first demo. 
-        // If not (else) then it went directly to IAT section
+        // If this runs, there was a demographic section. If not (else) then it went directly to IAT section
         if (res1.method) {
             bias[res1.method]()
             bias.api.pause(1000)
@@ -29,25 +25,53 @@ module.exports = {
                 console.log('no 2nd demo')
             }
         }
-        // IAT section 1
-        bias
-            .click('@continue')
+        // IAT
+        bias.click('@continue')
             .pause(1000)
-        browser.keys(browser.Keys.SPACE)
-        bias.pause(1000)
-        browser.keys("e")
-        bias.pause(1000)
-        await runKeyPress()
-        browser.keys("e")
-        bias.pause(1000)
-        await runKeyPress()
-        bias.pause(5000)
-
-        //after all 7 key press sections
-        // browser.keys(browser.Keys.SPACE)
+        browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        function continueTest() {
+            bias.api.element(
+                'xpath',
+                '//*[contains(text(),"If you make a mistake")]',
+                async result => {
+                    if (!result.value.error) {
+                        browser.keys('e');
+                        await runKeyPress(browser);
+                        continueTest()
+                    }
+                }
+            );
+        }
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), browser.keys(browser.Keys.SPACE), bias.pause(1000)
+        continueTest(), bias.pause(1000)
+        //after all 7 key press sections are complete
+        browser.keys(browser.Keys.SPACE), bias.pause(10000)
+        //below here is where I would call the demographic if function again, 
+        // if one or zero sections appeared before the IAT. 
+        //for some reason it isn't running demo13() when it needs to, though.
         // bias
-        // .waitForElementVisible('@resultBox')
-        // .getText('@biasResult')
+        // if (res1.method) {
+        //     bias[res1.method]()
+        //     bias.api.pause(500)
+        //     let res2 = await runDemoTests()
+        //     if (res2.method) {
+        //         bias[res2.method]()
+        //     }
+        //     // This will run if the first demo ran, but no second demo
+        //     else {
+        //         console.log('no 2nd demo')
+        //     }
+        // }
+        //below I tried to find a way to print the text in the results box, to no avail with the time restraint
+        // bias
+        // results = bias.findElement(By.xpath('//*[@id="pi-app"]/div/div/div[2]/div/div/ol/li[1]/div/div[1]/div/p')).getText();
+        // System.out.println(results);
     },
 }
 
@@ -74,25 +98,34 @@ async function runDemoTests() {
     return status
 }
 
-async function runKeyPress() {
+async function runKeyPress(browser) {
     let status = {
         run: false,
         method: ''
     }
-    let ePress = await bias.api.element('xpath', '//*[@id="canvas"]/div[3]')
-    if (ePress.value.error) status = {
+    let hasError = await bias.api.element('xpath', '//*[@id="canvas"]/div[3]')
+    if (!hasError.value.error) status = {
         run: true,
-        method: 'pressE'
+        method: 'pressI'
     }
-    if (!status.run) {
-        let iPress = await bias.api.element('xpath', '//*[@id="canvas"]/div[3]')
-        if (!iPress.value.error) status = {
-            run: true,
-            method: 'pressI'
-        }
-        console.log('iPress', iPress)
+    if (status.run) {
+        bias[status.method](browser)
     }
-    console.log('ePress', ePress)
-    console.log(status)
     return status
 }
+// Ideally I would house this down here & call it in my test more cleanly
+// async function continueTest(browser) {
+//     bias.api.element(
+//         'xpath',
+//         '//*[contains(text(),"If you make a mistake")]',
+//         async result => {
+//             if (!result.value.error) {
+//                 browser.keys('e');
+//                 bias.pause(1000);
+//                 await runKeyPress(browser);
+//                 bias.pause(1000)
+//                 continueTest()
+//             }
+//         }
+//     );
+// }

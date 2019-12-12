@@ -5,9 +5,31 @@
 
   <testsuite name="bias"
     errors="0" failures="0" hostname="" id="" package="bias" skipped="0"
-    tests="1" time="44.11" timestamp="">
+    tests="1" time="83.25" timestamp="">
   
-    <testcase name="Taking the test" classname="bias" time="44.11" assertions="17">
+    <testcase name="Taking the test" classname="bias" time="83.25" assertions="28">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 
