@@ -123,8 +123,6 @@ module.exports = {
             locateStrategy: 'xpath'
             
         }
-
-
     }
 }
 async function runKeyPress(browser) {
