@@ -9,7 +9,7 @@ module.exports = {
     "log_path": "",
     "port": 4444,
     "cli_args": {
-      "webdriver.chrome.driver": properties.resourcePath + properties.chromedriver,
+      "webdriver.chrome.driver": properties.chromedriver,
     }
   },
   "test_settings": {

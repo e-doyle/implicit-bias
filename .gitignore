@@ -1,3 +1,4 @@
 nightwatch.props.js
 tests_output/
 reports/
+selenium-server.log
