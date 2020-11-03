@@ -12,6 +12,6 @@ module.exports = {
  }
 ```
 
-To update chromedriver to the latest version, run `npm update chromedriver`
+To use latest chromedriver version, run `npm install chromedriver --save-dev`
 
 To run the implicit bias test, run `nightwatch tests/bias.js`
